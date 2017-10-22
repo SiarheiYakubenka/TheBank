@@ -1,4 +1,4 @@
-package by.itclass.the_bank;
+package the_bank.accounts;
 
 import java.math.BigDecimal;
 

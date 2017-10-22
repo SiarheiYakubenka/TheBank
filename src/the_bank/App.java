@@ -1,4 +1,11 @@
-package by.itclass.the_bank;
+package the_bank;
+
+import the_bank.accounts.Account;
+import the_bank.accounts.Currency;
+import the_bank.accounts.DebitAccount;
+import the_bank.customers.Customer;
+import the_bank.deposit_boxes.DepositBox;
+import the_bank.deposit_boxes.PreciousMetals;
 
 import java.math.BigDecimal;
 
@@ -29,6 +36,21 @@ public class App {
             System.err.println("Недостаточно средств для перевода");
         else if (transfer == 0)
             System.err.println("Нельзя перевести на этот же счет");
+
+        DepositBox<PreciousMetals> depositBox1 = new DepositBox<>(PreciousMetals.GOLD, 1000 );
+
+        Customer customer1 = new Customer("Jonh", "Dolson", "HB123412");
+        customer1.addAccount(acc);
+        customer1.addDepositBoxe(depositBox1);
+        System.out.println(customer1);
+
+        for (int i = 0; i <customer1.getAccounts().length ; i++) {
+            System.out.println(customer1.getAccounts()[i]);
+        }
+
+        for (int i = 0; i <customer1.getDepositBoxes().length ; i++) {
+            System.out.println(customer1.getDepositBoxes()[i]);
+        }
 
     }
 }

@@ -1,4 +1,4 @@
-package by.itclass.the_bank;
+package the_bank;
 
 
 public interface AbleToStore {

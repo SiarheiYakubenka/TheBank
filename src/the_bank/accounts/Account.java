@@ -1,4 +1,6 @@
-package by.itclass.the_bank;
+package the_bank.accounts;
+
+import the_bank.AbleToStore;
 
 import java.math.BigDecimal;
 import java.util.Locale;
@@ -8,7 +10,7 @@ public abstract class Account implements AbleToStore {
     private final Currency currency;
 
 
-    public Account(BigDecimal amount, Currency currency) {
+    Account(BigDecimal amount, Currency currency) {
         if(amount== null || currency == null) throw new NullPointerException();
         else if(amount.signum()<0) throw new IllegalArgumentException("Сумма не может быть отрицательной");
 
@@ -58,17 +60,17 @@ public abstract class Account implements AbleToStore {
 
     @Override
     public String toString() {
-        String out = String.format(Locale.FRANCE,
-                        "%nВалюта счета: "+getCurrency().getDescription()
-                        +"%nБаланс счета составляет: %.2f " + getCurrency(), getBalance());
+        StringBuilder out = new StringBuilder(String.format(Locale.FRANCE,
+                "%nВалюта счета: " + getCurrency().getDescription()
+                        + "%nБаланс счета составляет: %.2f " + getCurrency(), getBalance()));
         Currency[] allcurrency = Currency.values();
         for ( Currency toCurrency: allcurrency) {
             if(toCurrency != getCurrency()) {
                 BigDecimal b = Exchange.Convert(getCurrency(), toCurrency, getBalance());
-                out += String.format("%n%.2f "+toCurrency, b.setScale(2, BigDecimal.ROUND_HALF_UP));
+                out.append(String.format("%n%.2f " + toCurrency, b.setScale(2, BigDecimal.ROUND_HALF_UP)));
             }
         }
-        return out;
+        return out.toString();
     }
 
     @Override
@@ -84,13 +86,10 @@ public abstract class Account implements AbleToStore {
         }
         Account other = (Account) obj;
         if (this.getCurrency().compareTo(other.getCurrency()) == 0){
-            if (this.getBalance().compareTo(other.getBalance()) == 0){
-            return true;
-            }else return false;
+            return this.getBalance().compareTo(other.getBalance()) == 0;
         }else {
             BigDecimal b = Exchange.Convert(other.getCurrency(), getCurrency(), other.getBalance());
-            if(this.getBalance().compareTo(b) == 0) return true;
-            else return false;
+            return this.getBalance().compareTo(b) == 0;
         }
     }
 }

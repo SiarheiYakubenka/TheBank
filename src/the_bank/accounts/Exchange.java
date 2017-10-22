@@ -1,10 +1,12 @@
-package by.itclass.the_bank;
+package the_bank.accounts;
+
+import the_bank.accounts.Currency;
 
 import java.math.BigDecimal;
 
-public class Exchange {
+class Exchange {
 
-    public static BigDecimal Convert(Currency fromCurrency, Currency toCurrency, BigDecimal amount){
+    static BigDecimal Convert(Currency fromCurrency, Currency toCurrency, BigDecimal amount){
          BigDecimal result = amount;
          result = result.multiply(toCurrency.getRate()).setScale(6, BigDecimal.ROUND_HALF_EVEN);
          result = result.divide(fromCurrency.getRate(), 2, BigDecimal.ROUND_HALF_EVEN);

@@ -1,17 +1,19 @@
-package by.itclass.the_bank;
+package the_bank.deposit_boxes;
 
 import java.math.BigDecimal;
 
-public class Shares implements Valuable {
+public enum PreciousMetals implements Valuable {
+    SILVER("Серебро","1"),
+    GOLD("Золото","81"),
+    PLATINUM("Платина","58"),
+    PALLADIUM("Палладий","59");
 
-    private final String  name;
     private BigDecimal value;
+    private String name;
 
-
-    public Shares(String name, String value, int sum){
+    PreciousMetals(String name, String value){
         this.name = name;
         this.value = new BigDecimal(value);
-
     }
 
     @Override
@@ -26,5 +28,4 @@ public class Shares implements Valuable {
     public String getName() {
         return name;
     }
-
 }
