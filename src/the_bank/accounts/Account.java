@@ -1,67 +1,56 @@
 package the_bank.accounts;
 
-import the_bank.AbleToStore;
+import the_bank.Storable;
+import the_bank.NegativeNumberException;
 
 import java.math.BigDecimal;
 import java.util.Locale;
 
-public abstract class Account implements AbleToStore {
+public abstract class Account implements Storable {
     private BigDecimal balance;
     private final Currency currency;
-
+    private final String id;
+    private static int count;
 
     Account(BigDecimal amount, Currency currency) {
-        if(amount== null || currency == null) throw new NullPointerException();
-        else if(amount.signum()<0) throw new IllegalArgumentException("Сумма не может быть отрицательной");
-
-
-        balance = amount.setScale(2, BigDecimal.ROUND_FLOOR);
+        if (amount == null || currency == null) throw new NullPointerException("Счет или валюта = null");
+        if(amount.signum()<0) throw new NegativeNumberException("Сумма не может быть отрицательной", amount.toString());
         this.currency = currency;
+        setBalance(amount);
+        count++;
+        id = String.format("%s%h%08d", currency, this.hashCode(), count);
+        System.out.printf("%n%nСчет успешно создан"+this);
     }
 
 
-    public BigDecimal getBalance() {
+    BigDecimal getBalance() {
         return balance;
     }
-    public Currency getCurrency() {
+
+    Currency getCurrency() {
         return currency;
     }
 
-    public void setBalance(BigDecimal balance) {
+    public static int getCount() {
+        return count;
+    }
+
+    void setBalance(BigDecimal balance) {
         this.balance = balance.setScale(2, BigDecimal.ROUND_FLOOR);
     }
 
 
-    public abstract boolean withdraw(BigDecimal amount, Currency currency);
-
-    public  void replenish(BigDecimal amount, Currency currency){
-        if (amount == null || currency == null) throw new NullPointerException("amount или currency = null");
-        else if(amount.signum()<0) throw new IllegalArgumentException("Сумма не может быть отрицательной");
-
-        if(this.getCurrency() == currency)
-        setBalance(getBalance().add(amount));
-        else {
-            BigDecimal b = Exchange.Convert(currency, getCurrency(), amount);
-            setBalance(getBalance().add(b));
-        }
-    }
-
-    public int transfer(Account account, BigDecimal amount, Currency currency){
-        if (account == null ||amount == null || currency == null) throw new NullPointerException();
-        else if(amount.signum()<0) throw new IllegalArgumentException("Сумма не может быть отрицательной");
-
-        if (this != account){
-            if(this.withdraw(amount, currency)){
-                account.replenish(amount, currency);
-                return 1;
-            } else return -1;
-        }else return 0;
+    @Override
+    public void takeOffCommission() {
+        if (this instanceof CreditAccount || getBalance().compareTo(getCurrency().getCommission())>=0)
+            setBalance(getBalance().subtract(getCurrency().getCommission()));
     }
 
     @Override
     public String toString() {
         StringBuilder out = new StringBuilder(String.format(Locale.FRANCE,
-                "%nВалюта счета: " + getCurrency().getDescription()
+                "%nid счета: "+id
+                        +"%nВалюта счета: " + getCurrency().getDescription()
                         + "%nБаланс счета составляет: %.2f " + getCurrency(), getBalance()));
         Currency[] allcurrency = Currency.values();
         for ( Currency toCurrency: allcurrency) {

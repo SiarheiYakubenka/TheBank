@@ -1,10 +1,10 @@
 package the_bank.deposit_boxes;
 
-import the_bank.AbleToStore;
+import the_bank.Storable;
 
 import java.math.BigDecimal;
 
-public  class DepositBox<T extends Valuable> implements AbleToStore {
+public  class DepositBox<T extends Valuable> implements Storable {
 
     private T values;
     private int quantity;

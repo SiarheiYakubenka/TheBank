@@ -1,7 +1,7 @@
 package the_bank;
 
 
-public interface AbleToStore {
+public interface Storable {
 
     void takeOffCommission();
 }
