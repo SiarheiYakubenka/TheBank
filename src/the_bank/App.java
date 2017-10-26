@@ -6,19 +6,31 @@ import the_bank.deposit_boxes.DepositBox;
 import the_bank.deposit_boxes.PreciousMetals;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class App {
     public static void main(String[] args) {
+
+        Map<Customer, ArrayList<Storable>>  customersList = new HashMap<>();
+
+        Customer customer1 = new Customer("Иван", "Иванов", "НВ122390");
+
+        ArrayList<Storable> storage = new ArrayList<>();
+        customersList.put(customer1, storage);
+
         try {
             Account account1 = new DebitAccount(new BigDecimal("500"), Currency.valueOf("BYN"));
-            Operation.replenish(account1, new BigDecimal("95"), Currency.BYN);
-            Account account2 = new CreditAccount(new BigDecimal("100"), Currency.USD);
-            Operation.transfer(account2, account1, new BigDecimal("50"), Currency.USD);
-
+            storage.add(account1);
+            customersList.put(customer1, storage);
         }catch (NullPointerException e){
             System.out.println(e.getMessage());
         }catch (NegativeNumberException e){
             System.out.println(e.getMessage()+" "+e.getValueName());
         }
+
+
+
     }
 }

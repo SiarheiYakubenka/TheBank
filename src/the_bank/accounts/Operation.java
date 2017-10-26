@@ -3,8 +3,16 @@ package the_bank.accounts;
 import the_bank.NegativeNumberException;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Operation {
+
+    private static List<String> OPERATIONS;
+
+    static {
+        OPERATIONS = new ArrayList<>();
+    }
 
     public static void replenish(Account account, BigDecimal amount, Currency currency){
         if (account == null || amount == null || currency == null)
@@ -19,9 +27,12 @@ public class Operation {
             BigDecimal b = Exchange.Convert(currency, account.getCurrency(), amount);
             account.setBalance(account.getBalance().add(b));
         }
-
-        System.out.printf("%n%nОперация прошла успешно. Баланс пополнен на %.2f %s %n " + account,
+        String s = String.format("%n%nОперация прошла успешно. Баланс пополнен на %.2f %s %n " + account,
                 amount, currency);
+
+        System.out.println(s);
+
+        OPERATIONS.add(s);
     }
 
     public static int transfer(Account account1, Account account2, BigDecimal amount, Currency currency){

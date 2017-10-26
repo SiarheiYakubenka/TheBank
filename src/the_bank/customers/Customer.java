@@ -8,8 +8,7 @@ public class Customer {
     private final String name;
     private String secondName;
     private String passportID;
-    private Account[] accounts;
-    private DepositBox[] depositBoxes;
+
 
     public Customer(String name, String secondName, String passportID) {
         this.name = name;
@@ -26,12 +25,7 @@ public class Customer {
     public String getPassportID() {
         return passportID;
     }
-    public Account[] getAccounts() {
-        return accounts;
-    }
-    public DepositBox[] getDepositBoxes() {
-        return depositBoxes;
-    }
+
 
     public void setSecondName(String secondName) {
         this.secondName = secondName;
@@ -39,7 +33,6 @@ public class Customer {
     public void setPassportID(String passportID) {
         this.passportID = passportID;
     }
-
 
 
     @Override
@@ -60,30 +53,5 @@ public class Customer {
         }
         Customer other = (Customer) obj;
         return this.getPassportID().compareTo(other.getPassportID()) == 0;
-    }
-
-    public void addAccount(Account account){
-        if (accounts == null)
-            accounts = new Account[]{account};
-        else{
-            Account[] temp = new Account[accounts.length];
-            accounts = new Account[accounts.length+1];
-            for (int i = 0; i < temp.length ; i++) {
-                accounts[i] = temp[i];
-            }
-            accounts[accounts.length-1] = account;
-        }
-    }
-    public void addDepositBoxe(DepositBox depositBox){
-        if (depositBoxes == null)
-            depositBoxes = new DepositBox[]{depositBox};
-        else{
-            DepositBox[] temp = new DepositBox[depositBoxes.length];
-            depositBoxes = new DepositBox[depositBoxes.length+1];
-            for (int i = 0; i < temp.length ; i++) {
-                depositBoxes[i] = temp[i];
-            }
-            depositBoxes[accounts.length-1] = depositBox;
-        }
     }
 }
