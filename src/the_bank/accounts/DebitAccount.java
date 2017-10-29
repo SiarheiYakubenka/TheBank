@@ -9,6 +9,16 @@ public class DebitAccount extends Account {
     }
 
     @Override
+    public void calcOfInterest() {
+
+    }
+
+    @Override
+    public void accrualOfInterest() {
+
+    }
+
+    @Override
     public String toString() {
         return  String.format("%nТип счета: Дебетовый"+super.toString());
     }

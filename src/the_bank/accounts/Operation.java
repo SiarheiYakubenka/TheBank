@@ -27,8 +27,8 @@ public class Operation {
             BigDecimal b = Exchange.Convert(currency, account.getCurrency(), amount);
             account.setBalance(account.getBalance().add(b));
         }
-        String s = String.format("%n%nОперация прошла успешно. Баланс пополнен на %.2f %s %n " + account,
-                amount, currency);
+        String s = String.format("%nОперация прошла успешно. Баланс пополнен на %.2f %s." +
+                        "%nНовый баланс составляет: %.2f ", amount, currency, account.getBalance());
 
         System.out.println(s);
 
@@ -57,15 +57,21 @@ public class Operation {
             if(account.getCurrency() == currency){
 
                 account.setBalance(account.getBalance().subtract(amount));
-                System.out.printf("%n%nОперация прошла успешно. Со счета сняли %.2f %s %n " + account,
-                        amount, currency);
+                String s = String.format("%nОперация прошла успешно. Со счета списано %.2f %s." +
+                        "%nНовый баланс составляет: %.2f %s",
+                        amount, currency, account.getBalance(), account.getCurrency());
+                System.out.println(s);
+                OPERATIONS.add(s);
                 return true;
             }
             else {
                 BigDecimal convertedAmount = Exchange.Convert(currency, account.getCurrency(), amount);
                 account.setBalance(account.getBalance().subtract(convertedAmount));
-                System.out.printf("%n%nОперация прошла успешно. Со счета сняли %.2f %s %n " + account,
-                        amount, currency);
+                String s = String.format("%nОперация прошла успешно. Со счета списано %.2f %s." +
+                        "%nНовый баланс составляет: %.2f %s",
+                        amount, currency, account.getBalance(), account.getCurrency());
+                System.out.println(s);
+                OPERATIONS.add(s);
                 return true;
             }
         }

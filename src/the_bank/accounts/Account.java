@@ -12,6 +12,10 @@ public abstract class Account implements Storable {
     private final String id;
     private static int count;
 
+    static {
+        count = 0;
+    }
+
     Account(BigDecimal amount, Currency currency) {
         if (amount == null || currency == null) throw new NullPointerException("Счет или валюта = null");
         if(amount.signum()<0) throw new NegativeNumberException("Сумма не может быть отрицательной", amount.toString());
@@ -19,15 +23,13 @@ public abstract class Account implements Storable {
         setBalance(amount);
         count++;
         id = String.format("%s%h%08d", currency, this.hashCode(), count);
-        System.out.printf("%n%nСчет успешно создан"+this);
     }
 
-
-    BigDecimal getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 
-    Currency getCurrency() {
+    public Currency getCurrency() {
         return currency;
     }
 
@@ -35,13 +37,20 @@ public abstract class Account implements Storable {
         return count;
     }
 
+    public static void decrCount(){
+        count--;
+    }
+
     void setBalance(BigDecimal balance) {
         this.balance = balance.setScale(2, BigDecimal.ROUND_FLOOR);
     }
 
+    public abstract void calcOfInterest();
+
+    public abstract void  accrualOfInterest();
 
     @Override
-    public void takeOffCommission() {
+    public void takeOffCommission(Account account) {
         if (this instanceof CreditAccount || getBalance().compareTo(getCurrency().getCommission())>=0)
             setBalance(getBalance().subtract(getCurrency().getCommission()));
     }
@@ -52,13 +61,6 @@ public abstract class Account implements Storable {
                 "%nid счета: "+id
                         +"%nВалюта счета: " + getCurrency().getDescription()
                         + "%nБаланс счета составляет: %.2f " + getCurrency(), getBalance()));
-        Currency[] allcurrency = Currency.values();
-        for ( Currency toCurrency: allcurrency) {
-            if(toCurrency != getCurrency()) {
-                BigDecimal b = Exchange.Convert(getCurrency(), toCurrency, getBalance());
-                out.append(String.format("%n%.2f " + toCurrency, b.setScale(2, BigDecimal.ROUND_HALF_UP)));
-            }
-        }
         return out.toString();
     }
 
@@ -81,4 +83,5 @@ public abstract class Account implements Storable {
             return this.getBalance().compareTo(b) == 0;
         }
     }
+
 }

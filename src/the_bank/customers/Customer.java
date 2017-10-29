@@ -1,14 +1,9 @@
 package the_bank.customers;
 
-import the_bank.accounts.Account;
-import the_bank.deposit_boxes.DepositBox;
-import the_bank.deposit_boxes.Valuable;
-
 public class Customer {
     private final String name;
     private String secondName;
     private String passportID;
-
 
     public Customer(String name, String secondName, String passportID) {
         this.name = name;
@@ -34,10 +29,9 @@ public class Customer {
         this.passportID = passportID;
     }
 
-
     @Override
     public String toString() {
-        return getName()+" "+getSecondName();
+        return getSecondName()+" "+getName()+" "+getPassportID();
     }
 
     @Override
@@ -54,4 +48,5 @@ public class Customer {
         Customer other = (Customer) obj;
         return this.getPassportID().compareTo(other.getPassportID()) == 0;
     }
+
 }

@@ -1,6 +1,9 @@
 package the_bank.deposit_boxes;
 
 import the_bank.Storable;
+import the_bank.accounts.Account;
+import the_bank.accounts.Currency;
+import the_bank.accounts.Operation;
 
 import java.math.BigDecimal;
 
@@ -19,13 +22,28 @@ public  class DepositBox<T extends Valuable> implements Storable {
     }
 
     @Override
-    public void takeOffCommission() {
-        if(values instanceof Shares){
+    public void takeOffCommission(Account account) {
+        BigDecimal commission, amount;
 
+        if(values instanceof Shares){
+            commission = new BigDecimal("0.1");
+            amount = new BigDecimal("100");
+            takeCommission(account, commission, amount );
         }
         if(values instanceof PreciousMetals){
-
+            commission = new BigDecimal("0.2");
+            amount = new BigDecimal("50");
+            takeCommission(account, commission, amount );
         }
+    }
+
+    private void takeCommission(Account account, BigDecimal commission, BigDecimal amount){
+        if (getSumm().compareTo(amount)>0) {
+            BigDecimal b = getSumm().divide(amount, 0, BigDecimal.ROUND_HALF_UP);
+            commission = commission.multiply(b).setScale(1, BigDecimal.ROUND_HALF_UP);
+        }
+        if(!Operation.withdraw(account, commission, Currency.BYN))
+            System.out.println("Недостаточно средств для снятия коммиссии");
     }
 
     @Override
@@ -36,7 +54,7 @@ public  class DepositBox<T extends Valuable> implements Storable {
         }
         if(values instanceof PreciousMetals){
             return String.format("%nСодержимое ячейки: %n"+((PreciousMetals) values).getName()+
-            "%nКоличество %d г. %nЦенность %.2f BYN", quantity, summ);
+            "%nКоличество %d г. %nЦенность %.2f BYN", getQuantity(), getSumm());
         }
        return "";
     }
@@ -48,4 +66,5 @@ public  class DepositBox<T extends Valuable> implements Storable {
     public int getQuantity() {
         return quantity;
     }
+
 }
