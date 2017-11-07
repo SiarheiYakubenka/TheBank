@@ -1,108 +1,190 @@
 package the_bank;
 
-import the_bank.accounts.Account;
-import the_bank.accounts.DebitAccount;
+import the_bank.accounts.*;
+import the_bank.accounts.Currency;
 import the_bank.customers.Customer;
-import the_bank.customers.CustomerComparator;
+import the_bank.deposit_boxes.DepositBox;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.TreeMap;
+import java.math.BigDecimal;
+import java.util.*;
 
 public class Bank {
 
-    private static Map<Customer, ArrayList<Storable>> customersList;
+    private static Map<Customer, ArrayList<AbleToStore>> customersList;
+
+    private static Set<Customer> clients;
+
+    private static Map<Long, Account> accounts;
+    private static Map<Long, DepositBox> storages;
+
+    private static Map<Customer, Set<Long>> clientAccounts;
+    private static Map<Customer, Set<Long>> clientStorages;
+
+    private static List<AbleToStore> commissions;
+
+    private static long accountId;
+    private static long storageId;
 
     static {
-        customersList = new TreeMap<>(new CustomerComparator());
+        customersList = new TreeMap<>();
+        clients = new HashSet<>();
+        accounts = new HashMap<>();
+        storages = new HashMap<>();
+
+        clientStorages = new HashMap<>();
+        clientAccounts = new HashMap<>();
+        accountId = 1;
+        storageId = 1;
+        commissions = new ArrayList<>();
     }
 
-    public static Map<Customer, ArrayList<Storable>> getCustomersList() {
-        return customersList;
-    }
 
-    public static void addCustomer(Customer customer, Account account){
-        if (customer == null || account == null) throw new NullPointerException();
-        if (!customersList.containsKey(customer)){
-        customersList.put(customer, new ArrayList<>());
-        customersList.get(customer).add(account);
-        }else {
-            System.out.println("Клиент уже существует");
-        }
-    }
-
-    public static void addCustomer(String name, String secondName, String passportID, Account account){
-        if (account == null) throw new NullPointerException();
+    public static void addClient(String name, String secondName, String passportID){
         Customer customer = new Customer(name, secondName, passportID);
-        if (!customersList.containsKey(customer)){
-        customersList.put(customer, new ArrayList<>());
-        customersList.get(customer).add(account);
-        System.out.println("Клиент успешно добавлен");
-        System.out.println(customer);
-        System.out.println(account);
-        }else {
-            System.out.println("Клиент уже существует");
-        }
+        clients.add(customer);
+        clientAccounts.put(customer, new HashSet<>());
+        clientStorages.put(customer, new HashSet<>());
     }
 
-    public static void deleteClient(String id){
-        Customer customer1 = new Customer("", "", id);
-        if (!customersList.isEmpty()) {
-            for (Customer customer : customersList.keySet()) {
-                if (customer.equals(customer1)){
-                customersList.remove(customer);
-                Account.decrCount();
-                break;
-                }
-            }
+    public Long addNewDebitAccount(Customer customer, Currency currency) {
+        if (customer == null) {
+            throw new IllegalArgumentException("Нельзя создать счет для несущуствующего клиента");
         }
-        else{
-            System.out.println("Клиента не существует");
-        }
+        Account account = new DebitAccount(currency);
+        accounts.put(accountId, account);
+        clientAccounts.get(customer).add(accountId);
+        commissions.add(account);
+        long temp = accountId;
+        accountId++;
+        return temp;
     }
 
-    public static void getClientsInfo(){
-        if (customersList.isEmpty()) return;
-        for (Customer customer : customersList.keySet()) {
-            System.out.println(customer);
-            for (Storable storage : customersList.get(customer))
-                System.out.println(storage);
+    public Long addNewPercentAccount(Customer customer, Currency currency, float percent) {
+        if (customer == null) {
+            throw new IllegalArgumentException("Нельзя создать счет для несущуствующего клиента");
         }
+        PercentAccount account = new PercentAccount(currency, percent);
+        accounts.put(accountId, account);
+        clientAccounts.get(customer).add(accountId);
+        commissions.add(account);
+        long temp = accountId;
+        accountId++;
+        return temp;
     }
 
-    public static void addStorage(Customer customer, Storable storage){
-        if (customer == null || storage == null) throw new NullPointerException();
-        if (customersList.containsKey(customer))
-            customersList.get(customer).add(storage);
-        else
-            System.out.println("Нельзя добавить аккаунт или ячейку. Клиента не существует");
+    public Long addNewCredittAccount(Customer customer, Currency currency, float percent) {
+        if (customer == null) {
+            throw new IllegalArgumentException("Нельзя создать счет для несущуствующего клиента");
+        }
+        CreditAccount account = new CreditAccount(currency, percent);
+        accounts.put(accountId, account);
+        clientAccounts.get(customer).add(accountId);
+        commissions.add(account);
+        long temp = accountId;
+        accountId++;
+        return temp;
     }
 
-    public static void takeCommissionAndInterests(){
+    public void depositOnAccount(Customer customer, BigDecimal amount, Currency currency, long id) {
+        if (customer == null || !clients.contains(customer)) {
+            throw new IllegalArgumentException("Нельзя передавать несуществующего клиента");
+        }
+        if (!accounts.containsKey(id)) {
+            throw new IllegalArgumentException("Такого счета не существует");
+        }
+        if (!clientAccounts.get(customer).contains(id)) {
+            throw new IllegalArgumentException("Счет не принадлежит клиенту");
+        }
+        accounts.get(id).deposit(amount, currency);
+    }
+
+    public void withdrawFromAccount(Customer customer, BigDecimal amount, Currency currency, long id) {
+        if (customer == null || !clients.contains(customer)) {
+            throw new IllegalArgumentException("Нельзя передавать несуществующего клиента");
+        }
+        if (!accounts.containsKey(id)) {
+            throw new IllegalArgumentException("Такого счета не существует");
+        }
+        if (!clientAccounts.get(customer).contains(id)) {
+            throw new IllegalArgumentException("Счет не принадлежит клиенту");
+        }
+        accounts.get(id).withdraw(amount, currency);
+    }
+
+    public BigDecimal getAccountBalance(Customer customer, long id) {
+        if (customer == null || !clients.contains(customer)) {
+            throw new IllegalArgumentException("Нельзя передавать несуществующего клиента");
+        }
+        if (!accounts.containsKey(id)) {
+            throw new IllegalArgumentException("Такого счета не существует");
+        }
+        if (!clientAccounts.get(customer).contains(id)) {
+            throw new IllegalArgumentException("Счет не принадлежит клиенту");
+        }
+        return accounts.get(id).getBalance();
+    }
+
+    public void transfer(Customer customer, BigDecimal amount, Currency currency, long source, long destination) {
+        if (customer == null || !clients.contains(customer)) {
+            throw new IllegalArgumentException("Нельзя передавать несуществующего клиента");
+        }
+        if (!accounts.containsKey(source) || !accounts.containsKey(destination)) {
+            throw new IllegalArgumentException("Cчета не существует");
+        }
+        if (!clientAccounts.get(customer).contains(source)) {
+            throw new IllegalArgumentException("Счет не принадлежит клиенту");
+        }
+        accounts.get(source).transfer(accounts.get(destination), amount, currency);
+    }
+
+    public boolean searchClientByPassportNumber(String passportNumber) {
+        Customer fakeClient = new Customer("_", "_", passportNumber);
+        return this.clients.contains(fakeClient);
+    }
+
+    public boolean searchAccountById(long id){
+
+        return this.accounts.containsKey(id);
+    }
+
+
+    public static void addStorage(Customer customer, DepositBox storage){
+        if (customer == null || !clients.contains(customer)) {
+            throw new IllegalArgumentException("Нельзя передавать несуществующего клиента");
+        }
+        if (storage == null){
+            throw new IllegalArgumentException("storage = null");
+        }
+        storages.put(storageId, storage);
+
+    }
+
+    public static void takeCommissionAndPercent(){
 
         if (customersList.isEmpty()) return;
         for (Customer customer : customersList.keySet()) {
             Account account = (Account) customersList.get(customer).get(0);
-            for (Storable storage :  customersList.get(customer)) {
+            for (AbleToStore storage :  customersList.get(customer)) {
                 if (storage instanceof Account){
-                    storage.takeOffCommission((Account) storage);
-                    ((Account) storage).calcOfInterest();
+
 
                 }else {
-                    storage.takeOffCommission(account);
+                    storage.takeOffCommission();
                 }
 
             }
         }
     }
 
-    public static  void accrualInterest(){
+    public static  void  recalcMonthOutcome(){
 
         if (customersList.isEmpty()) return;
         for (Customer customer : customersList.keySet())
-            for (Storable storage :  customersList.get(customer))
-                if (storage instanceof Account)
-                    ((Account) storage).accrualOfInterest();
+            for (AbleToStore storage :  customersList.get(customer))
+                if (storage instanceof Account){
+
+                }
+
 
 
     }

@@ -23,7 +23,7 @@ public class App {
                     i = 0;
                     accrualInterest();
                 }
-                takeCommissionAndInterests();
+                takeCommissionAndPercent();
                 i++;
             }
         },  86_400_000, 86_400_000);
@@ -89,12 +89,12 @@ public class App {
 
             case "2": acc = new CreditAccount(10f, new BigDecimal(amount), curr); break;
 
-            case "3": acc = new InterestAccount(10f, new BigDecimal(amount), curr); break;
+            case "3": acc = new PercentAccount(10f, new BigDecimal(amount), curr); break;
 
             default:  acc = null;
         }
         try {
-            addCustomer(name, secondName, id, acc);
+            addClient(name, secondName, id, acc);
         }catch (NullPointerException e){
             System.out.println(e.getMessage());
             addClientMenu();

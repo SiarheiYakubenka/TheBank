@@ -8,17 +8,23 @@ public enum Currency {
     EUR("Евро","0.855194", "0.02"),
     RUR("Российские рубли","57.720954", "0.5");
 
-    private BigDecimal rate, commission;
+    private BigDecimal price, commission;
     private String description;
 
-    Currency(String description, String rate, String commission){
-        this.rate = new BigDecimal(rate);
+    Currency(String description, String price, String commission){
+        this.price = new BigDecimal(price);
         this.commission = new BigDecimal(commission);
         this.description = description;
     }
+    public void setPrice(double price) {
+        if (price <= 0) {
+            throw new IllegalArgumentException("Цена валюты не может быть <= 0");
+        }
+        this.price = new BigDecimal(String.valueOf(price));
+    }
 
-    public BigDecimal getRate() {
-        return rate;
+    public BigDecimal getPrice() {
+        return price;
     }
     public BigDecimal getCommission() {
         return commission;
@@ -27,11 +33,8 @@ public enum Currency {
         return description;
     }
 
-    public void setRate(BigDecimal rate) {
-        this.rate = rate;
+    @Override
+    public String toString() {
+        return description;
     }
-    public void setCommission(BigDecimal commission) {
-        this.commission = commission;
-    }
-
 }

@@ -1,25 +1,40 @@
 package the_bank.accounts;
 
+import the_bank.NegativeNumberException;
+
 import java.math.BigDecimal;
 
 public class DebitAccount extends Account {
 
-    public DebitAccount(BigDecimal amount, Currency currency) {
-        super(amount, currency);
+    public DebitAccount(Currency currency) {
+        super(currency);
     }
 
     @Override
-    public void calcOfInterest() {
-
-    }
-
-    @Override
-    public void accrualOfInterest() {
-
+    public void withdraw(BigDecimal amount, Currency currency) {
+        if (amount == null || currency == null){
+            throw new NullPointerException("Сумма или валюта не может быть пустой");
+        }
+        if(amount.signum() <= 0){
+            throw new NegativeNumberException("Неправильная сумма для снятия", amount.toString());
+        }
+        if (getBalance().compareTo(amount) < 0){
+            throw new NotEnoughValuableException();
+        }
+        if(getCurrency() == currency){
+            setBalance(getBalance().subtract(amount));
+        } else {
+            BigDecimal convertedAmount = Exchange.Convert(currency, getCurrency(), amount);
+            setBalance(getBalance().subtract(convertedAmount));
+        }
     }
 
     @Override
     public String toString() {
-        return  String.format("%nТип счета: Дебетовый"+super.toString());
+        return "DebitAccount{} " +
+                "balance=" + getBalance() +
+                "currency=" + getCurrency()+
+                "}";
     }
+
 }

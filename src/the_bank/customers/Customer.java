@@ -1,13 +1,16 @@
 package the_bank.customers;
 
 public class Customer {
-    private final String name;
+    private String name;
     private String secondName;
-    private String passportID;
+    private final String passportID;
 
     public Customer(String name, String secondName, String passportID) {
-        this.name = name;
-        this.secondName = secondName;
+        setName(name);
+        setSecondName(secondName);
+        if (passportID == null || passportID.isEmpty()){
+            throw new IllegalArgumentException("номер паспорта не может быть пустым");
+        }
         this.passportID = passportID;
     }
 
@@ -21,17 +24,27 @@ public class Customer {
         return passportID;
     }
 
+    public void setName(String name) {
+        if (name == null || name.isEmpty()){
+            throw new IllegalArgumentException("Имя не может быть пустым");
+        }
+        this.name = name;
+    }
 
     public void setSecondName(String secondName) {
+        if (secondName == null || secondName.isEmpty()){
+            throw new IllegalArgumentException("Фамилия не может быть пустой");
+        }
         this.secondName = secondName;
-    }
-    public void setPassportID(String passportID) {
-        this.passportID = passportID;
     }
 
     @Override
     public String toString() {
-        return getSecondName()+" "+getName()+" "+getPassportID();
+        return "Customer{" +
+                "name='" + name + '\'' +
+                ", secondName='" + secondName + '\'' +
+                ", passportID='" + passportID + '\'' +
+                '}';
     }
 
     @Override
@@ -49,4 +62,8 @@ public class Customer {
         return this.getPassportID().compareTo(other.getPassportID()) == 0;
     }
 
+    @Override
+    public int hashCode() {
+        return passportID.hashCode();
+    }
 }

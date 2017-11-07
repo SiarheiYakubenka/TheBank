@@ -1,30 +1,35 @@
 package the_bank.deposit_boxes;
 
-import java.math.BigDecimal;
-
 public class Shares implements Valuable {
 
     private final String  name;
-    private BigDecimal value;
+    private double value;
 
 
-    public Shares(String name, String value, int sum){
+    public Shares(String name, double value){
         this.name = name;
-        this.value = new BigDecimal(value);
+        this.value = value;
 
     }
 
     @Override
-    public BigDecimal getValue() {
+    public double getValue() {
         return value;
     }
 
-    public void setValue(String value) {
-        this.value = new BigDecimal(value);
+    public void setValue(double value) {
+        this.value = value;
     }
 
     public String getName() {
         return name;
     }
 
+    @Override
+    public String toString() {
+        return "Shares{" +
+                "name='" + name + '\'' +
+                ", value=" + value +
+                '}';
+    }
 }
