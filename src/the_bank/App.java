@@ -21,7 +21,7 @@ public class App {
             public void run() {
                 if(i == 30){
                     i = 0;
-                    accrualInterest();
+                    recalcMonthOutcome();
                 }
                 takeCommissionAndPercent();
                 i++;
@@ -35,9 +35,9 @@ public class App {
     static void showMenu(){
         while (true){
             System.out.println();
-            System.out.println("(1)Клиенты " + getCustomersList().size());
-            System.out.println("(2)Счета " + Account.getCount());
-            System.out.println("(3)Ячейки " + (getCustomersList().size() - Account.getCount()));
+            System.out.println("(1)Клиенты " + clients.size());
+            System.out.println("(2)Счета " + accounts.size());
+            System.out.println("(3)Ячейки " + storages.size());
             int s = Integer.parseInt(sc.nextLine());
             switch (s){
                 case 1: showClientsMenu(); break;

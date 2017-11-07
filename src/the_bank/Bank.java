@@ -10,12 +10,10 @@ import java.util.*;
 
 public class Bank {
 
-    private static Map<Customer, ArrayList<AbleToStore>> customersList;
+    static Set<Customer> clients;
 
-    private static Set<Customer> clients;
-
-    private static Map<Long, Account> accounts;
-    private static Map<Long, DepositBox> storages;
+    static Map<Long, Account> accounts;
+    static Map<Long, DepositBox> storages;
 
     private static Map<Customer, Set<Long>> clientAccounts;
     private static Map<Customer, Set<Long>> clientStorages;
@@ -26,7 +24,7 @@ public class Bank {
     private static long storageId;
 
     static {
-        customersList = new TreeMap<>();
+
         clients = new HashSet<>();
         accounts = new HashMap<>();
         storages = new HashMap<>();
@@ -161,32 +159,29 @@ public class Bank {
 
     public static void takeCommissionAndPercent(){
 
-        if (customersList.isEmpty()) return;
-        for (Customer customer : customersList.keySet()) {
-            Account account = (Account) customersList.get(customer).get(0);
-            for (AbleToStore storage :  customersList.get(customer)) {
-                if (storage instanceof Account){
-
-
-                }else {
-                    storage.takeOffCommission();
-                }
-
+        if (commissions.isEmpty()) return;
+        for (AbleToStore storage : commissions) {
+            storage.takeOffCommission();
+            if (storage instanceof CreditAccount){
+                ((CreditAccount) storage).calcOfPercent();
+            }else if (storage instanceof PercentAccount){
+                ((PercentAccount) storage).calcOfPercent();
             }
         }
+
+
     }
 
     public static  void  recalcMonthOutcome(){
 
-        if (customersList.isEmpty()) return;
-        for (Customer customer : customersList.keySet())
-            for (AbleToStore storage :  customersList.get(customer))
-                if (storage instanceof Account){
-
-                }
-
-
-
+        if (accounts.isEmpty()) return;
+        for (Map.Entry<Long, Account> entry : accounts.entrySet()){
+            if (entry.getValue() instanceof CreditAccount){
+                ((CreditAccount) entry.getValue()).calcOfPercent();
+            }else if (entry.getValue() instanceof PercentAccount){
+                ((PercentAccount) entry.getValue()).calcOfPercent();
+            }
+        }
     }
 
 }
