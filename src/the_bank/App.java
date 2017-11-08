@@ -2,6 +2,7 @@ package the_bank;
 
 import the_bank.accounts.*;
 import the_bank.accounts.Currency;
+import the_bank.customers.Customer;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -10,6 +11,22 @@ import static the_bank.Bank.*;
 
 public class App {
     private static Scanner sc = new Scanner(System.in);
+
+    private static void printMenu() {
+        System.out.println("\nКлиенты: " + clients.size() + " " +
+                "Счета: " + accounts.size() + " " +
+                "Ячейки: " + storages.size());
+        System.out.println("Выберите операцию");
+        System.out.println("1. Зарегистрировать клиента");
+        System.out.println("2. Открыть счет");
+        System.out.println("3. Снять деньги со счета");
+        System.out.println("4. Положить деньги на счет");
+        System.out.println("5. Проверить остаток на счете");
+        System.out.println("6. Перевести деньги со счета на счет");
+        System.out.println("7. Добавить ячейку");
+        System.out.println("0. Выход");
+    }
+
     public static void main(String[] args) {
 
         final Timer time = new Timer();
@@ -28,119 +45,337 @@ public class App {
             }
         },  86_400_000, 86_400_000);
 
-        showMenu();
-
-        }
-
-    static void showMenu(){
-        while (true){
-            System.out.println();
-            System.out.println("(1)Клиенты " + clients.size());
-            System.out.println("(2)Счета " + accounts.size());
-            System.out.println("(3)Ячейки " + storages.size());
-            int s = Integer.parseInt(sc.nextLine());
-            switch (s){
-                case 1: showClientsMenu(); break;
-                case 2: showAccountMenu(); break;
-                case 3: showBoxMenu(); break;
+        int command;
+        do {
+            command = -1;
+            printMenu();
+            try {
+                command = Integer.parseInt(sc.nextLine());
+            } catch (NumberFormatException e) {
+                continue;
             }
+            switch (command) {
+                case 0:
+                    break;
+                case 1:
+                    registerNewClient();
+                    break;
+                case 2:
+                    registerNewAccount();
+                    break;
+                case 3:
+                    withdrawAccountMoney();
+                    break;
+                case 4:
+                    depositAccountMoney();
+                    break;
+                case 5:
+                    checkAccountMoney();
+                    break;
+                case 6:
+                    menuAddStorage();
+                    break;
+                default:
+                    command = -1;
+                    break;
+            }
+        } while (command != 0);
+        System.out.println("До свидания");
+        System.exit(0);
+    }
+
+    private static void menuAddStorage() {
+        Customer customer = askForClientInfo();
+        Long serviceAccount = askForServiceAccount(customer);
+        if (serviceAccount == -1L) return;
+        int typeStorage = askForStorageInfo();
+
+
+        switch (typeStorage){
+            case 0:
+                break;
+            case 1:
+                break;
+            case 2:
+                break;
         }
 
     }
 
-    static void showClientsMenu() {
-        System.out.println();
-        System.out.println("Клиенты " + getCustomersList().size() + " " +
-                "Счета " + Account.getCount() + " " +
-                "Ячейки " + (getCustomersList().size() - Account.getCount()));
-        System.out.println("Добавить клиента(1)");
-        System.out.println("Удалить клиента(2)");
-        System.out.println("Информация о клиентах(3)");
-        int s = Integer.parseInt(sc.nextLine());
-        switch (s){
-            case 1: addClientMenu(); break;
-            case 2: delClient(); break;
-            case 3: getInfo(); break;
-        }
+    private static Long askForServiceAccount(Customer customer) {
+        Long accId = -1L;
+        int type;
+
+        do {
+            System.out.println("Для обслуживания ячейки нужно указать счет");
+            System.out.println("1. Выбрать существующий");
+            System.out.println("2. Открыть новый счет");
+            System.out.println("0. Отмена");
+            try {
+                type = Integer.parseInt(sc.nextLine());
+            } catch (NumberFormatException e) {
+                type = -1;
+            }
+            switch (type) {
+                case 0:
+                    break;
+                case 1:
+                     accId = askForAccountId();
+                     if (!clientAccounts.get(customer).contains(accounts.get(accId))){
+                         System.out.println("Указанный вами счет не принадлежит выбранному клиенту");
+                         accId = -1L;
+                         type = -1;
+                     }
+                    break;
+                case 2:
+                    break;
+                default:
+                    type = -1;
+                    break;
+            }
+
+        } while (type == -1);
+
+        return  accId;
 
     }
 
-    static void addClientMenu() {
-        String name, secondName, id, typeAcc, amount, currency;
-        Currency curr;
-        Account acc;
-        System.out.print("Введите имя клиента ");
-        name = sc.nextLine();
-        System.out.print("Введите фамилию клиента ");
-        secondName = sc.nextLine();
-        System.out.print("Введите id клиента ");
-        id = sc.nextLine();
-        System.out.println("Введите валюту счета для нового клиента.");
-        System.out.println("(BYN, USD, EUR, RUR )");
-        currency = sc.nextLine();
-        curr = Currency.valueOf(currency);
-        System.out.println("Введите сумму ");
-        amount = sc.nextLine();
-        System.out.println("Введите тип счета для нового клиента (Дебетовый(1), Кредитный(2), Процентный(3)");
-        typeAcc = sc.nextLine();
+    private static int askForStorageInfo(){
 
-        switch (typeAcc){
-            case "1": acc = new DebitAccount(new BigDecimal(amount), curr); break;
+        int type;
 
-            case "2": acc = new CreditAccount(10f, new BigDecimal(amount), curr); break;
+        do {
+            System.out.println("Что будете хранить в ячейке");
+            System.out.println("1. Акции");
+            System.out.println("2. Драгоценные металлы");
+            System.out.println("0. Отмена");
+            try {
+                type = Integer.parseInt(sc.nextLine());
+            } catch (NumberFormatException e) {
+                type = -1;
+            }
+            switch (type) {
+                case 0:
+                case 1:
+                case 2:
+                    return type;
+                default:
+                    type = -1;
+                    break;
+            }
 
-            case "3": acc = new PercentAccount(10f, new BigDecimal(amount), curr); break;
+        } while (type == -1);
 
-            default:  acc = null;
-        }
+        return type;
+    }
+
+    private static void registerNewClient() {
+
+        boolean success;
         try {
-            addClient(name, secondName, id, acc);
-        }catch (NullPointerException e){
-            System.out.println(e.getMessage());
-            addClientMenu();
+            System.out.print("Введите имя = ");
+            String name = sc.nextLine();
+            System.out.print("Введите фамилию = ");
+            String surname = sc.nextLine();
+            System.out.print("Введите номер паспорта = ");
+            String passportNumber = sc.nextLine();
+            addClient(name, surname, passportNumber);
+            success = true;
+        } catch (Exception e) {
+            success = false;
+        }
+
+        if (success) {
+            System.out.println("Клиент успешно зарегистрирован");
+        } else {
+            System.out.println("Ошибка при регистрации клиента");
         }
 
     }
 
-    static void delClient(){
-        System.out.println();
-        System.out.println("Введите id клиента, которого нужно удалить: ");
-        String id = sc.nextLine();
-        deleteClient(id);
-    }
+    private static void registerNewAccount() {
 
-    static void getInfo(){
-        getClientsInfo();
-    }
-
-    static void showAccountMenu(){
-        System.out.println();
-        System.out.println("Клиенты " + getCustomersList().size() + " " +
-                "Счета " + Account.getCount() + " " +
-                "Ячейки " + (getCustomersList().size() - Account.getCount()));
-        System.out.println("Добавить счет(1)");
-        System.out.println("Удалить счет(2)");
-        int s = Integer.parseInt(sc.nextLine());
-        switch (s){
-            case 1:  break;
-            case 2:  break;
+        Customer client = askForClientInfo();
+        int accountType = askForAccount();
+        Currency currency = askForCurrency();
+        switch (accountType) {
+            case 0:
+                return;
+            case 1:
+                long number = addNewDebitAccount(client, currency);
+                System.out.println("Открыт новый дебетовый счет под номером " + number);
+                break;
+            case 2:
+                int percents = askForPercents();
+                number = addNewPercentAccount(client, currency, percents);
+                System.out.println("Открыт новый процентный счет под номером " + number);
+                break;
+            case 3:
+                percents = askForPercents();
+                number = addNewCreditAccount(client, currency, percents);
+                System.out.println("Открыт новый кредитный счет под номером " + number);
+                break;
         }
 
     }
 
-    static void showBoxMenu(){
-        System.out.println();
-        System.out.println("Клиенты " + getCustomersList().size() + " " +
-                "Счета " + Account.getCount() + " " +
-                "Ячейки " + (getCustomersList().size() - Account.getCount()));
-        System.out.println("Добавить ячейку(1)");
-        System.out.println("Удалить ячейку(2)");
-        int s = Integer.parseInt(sc.nextLine());
-        switch (s){
-            case 1:  break;
-            case 2:  break;
+    private static void withdrawAccountMoney() {
+        Customer client = askForClientInfo();
+        long accountId = askForAccountId();
+        double amount = askForAmount();
+        try {
+            withdrawFromAccount(client, new BigDecimal(String.valueOf(amount)),accountId);
+            System.out.println("Деньги сняты со счета успешно");
+        } catch (NotEnoughValuableException e) {
+            System.out.println("Недостаточно денег на счету");
         }
-
     }
 
+    private static void checkAccountMoney() {
+        Customer client = askForClientInfo();
+        long accountId = askForAccountId();
+        BigDecimal sum = getAccountBalance(client, accountId);
+        System.out.println("Денег на счету = " + sum);
+    }
+
+    private static void depositAccountMoney() {
+        Customer client = askForClientInfo();
+        long accountId = askForAccountId();
+        BigDecimal amount = new BigDecimal(String.valueOf(askForAmount()));
+        depositOnAccount(client, amount, accountId);
+        System.out.println("Деньги положены успешно");
+    }
+
+    private static double askForAmount() {
+        double percents;
+
+        do {
+            System.out.print("Введите сумму = ");
+            try {
+                percents = Integer.parseInt(sc.nextLine());
+            } catch (NumberFormatException e) {
+                percents = 0;
+            }
+        } while (percents <= 0);
+
+
+        return percents;
+    }
+
+    private static long askForAccountId() {
+        long id;
+
+        do {
+            System.out.print("Введите номер счета = ");
+            try {
+                id = Integer.parseInt(sc.nextLine());
+                if (id > 0) {
+                    if (searchAccountById(id)) {
+                        return id;
+                    } else {
+                        id = 0;
+                    }
+                } else {
+                    id = 0;
+                }
+            } catch (NumberFormatException e) {
+                id = 0;
+            }
+        } while (id <= 0);
+
+
+        return id;
+    }
+
+    private static int askForAccount() {
+
+        int type;
+
+        do {
+            System.out.println("Выберите тип счета");
+            System.out.println("1. Дебетовый");
+            System.out.println("2. Процентный");
+            System.out.println("3. Кредитный");
+            System.out.println("0. Отмена");
+            try {
+                type = Integer.parseInt(sc.nextLine());
+            } catch (NumberFormatException e) {
+                type = -1;
+            }
+            switch (type) {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                    return type;
+                default:
+                    type = -1;
+                    break;
+            }
+
+        } while (type == -1);
+
+        return type;
+    }
+
+    private static Currency askForCurrency() {
+
+        int type;
+
+        do {
+            System.out.println("Выберите тип счета");
+            System.out.println("1. BYN");
+            System.out.println("2. EUR");
+            System.out.println("3. USD");
+            System.out.println("4. RUR");
+            try {
+                type = Integer.parseInt(sc.nextLine());
+            } catch (NumberFormatException e) {
+                type = -1;
+            }
+            switch (type) {
+                case 1:
+                    return Currency.BYN;
+                case 2:
+                    return Currency.EUR;
+                case 3:
+                    return Currency.USD;
+                case 4:
+                    return Currency.RUR;
+                default:
+                    type = -1;
+                    break;
+            }
+
+        } while (type == -1);
+
+        return Currency.BYN;
+    }
+
+    private static int askForPercents() {
+        int percents;
+
+        do {
+            System.out.print("Введите процент = ");
+            try {
+                percents = Integer.parseInt(sc.nextLine());
+            } catch (NumberFormatException e) {
+                percents = 0;
+            }
+        } while (percents <= 0);
+
+
+        return percents;
+    }
+
+    private static Customer askForClientInfo() {
+        System.out.print("Введите номер паспорта =");
+        String passportNumber = sc.nextLine();
+        boolean clientExists = searchClientByPassportNumber(passportNumber);
+        if (clientExists) {
+            return new Customer("_", "_", passportNumber);
+        }
+
+        return null;
+    }
 }

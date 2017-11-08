@@ -15,7 +15,7 @@ public class Bank {
     static Map<Long, Account> accounts;
     static Map<Long, DepositBox> storages;
 
-    private static Map<Customer, Set<Long>> clientAccounts;
+    static Map<Customer, Set<Long>> clientAccounts;
     private static Map<Customer, Set<Long>> clientStorages;
 
     private static List<AbleToStore> commissions;
@@ -44,7 +44,7 @@ public class Bank {
         clientStorages.put(customer, new HashSet<>());
     }
 
-    public Long addNewDebitAccount(Customer customer, Currency currency) {
+    public static Long addNewDebitAccount(Customer customer, Currency currency) {
         if (customer == null) {
             throw new IllegalArgumentException("Нельзя создать счет для несущуствующего клиента");
         }
@@ -57,7 +57,7 @@ public class Bank {
         return temp;
     }
 
-    public Long addNewPercentAccount(Customer customer, Currency currency, float percent) {
+    public static Long addNewPercentAccount(Customer customer, Currency currency, float percent) {
         if (customer == null) {
             throw new IllegalArgumentException("Нельзя создать счет для несущуствующего клиента");
         }
@@ -70,7 +70,7 @@ public class Bank {
         return temp;
     }
 
-    public Long addNewCredittAccount(Customer customer, Currency currency, float percent) {
+    public static Long addNewCreditAccount(Customer customer, Currency currency, float percent) {
         if (customer == null) {
             throw new IllegalArgumentException("Нельзя создать счет для несущуствующего клиента");
         }
@@ -83,7 +83,7 @@ public class Bank {
         return temp;
     }
 
-    public void depositOnAccount(Customer customer, BigDecimal amount, Currency currency, long id) {
+    public static void depositOnAccount(Customer customer, BigDecimal amount, long id) {
         if (customer == null || !clients.contains(customer)) {
             throw new IllegalArgumentException("Нельзя передавать несуществующего клиента");
         }
@@ -93,10 +93,10 @@ public class Bank {
         if (!clientAccounts.get(customer).contains(id)) {
             throw new IllegalArgumentException("Счет не принадлежит клиенту");
         }
-        accounts.get(id).deposit(amount, currency);
+        accounts.get(id).deposit(amount, accounts.get(id).getCurrency());
     }
 
-    public void withdrawFromAccount(Customer customer, BigDecimal amount, Currency currency, long id) {
+    public static void withdrawFromAccount(Customer customer, BigDecimal amount, long id) {
         if (customer == null || !clients.contains(customer)) {
             throw new IllegalArgumentException("Нельзя передавать несуществующего клиента");
         }
@@ -106,10 +106,10 @@ public class Bank {
         if (!clientAccounts.get(customer).contains(id)) {
             throw new IllegalArgumentException("Счет не принадлежит клиенту");
         }
-        accounts.get(id).withdraw(amount, currency);
+        accounts.get(id).withdraw(amount, accounts.get(id).getCurrency());
     }
 
-    public BigDecimal getAccountBalance(Customer customer, long id) {
+    public static BigDecimal getAccountBalance(Customer customer, long id) {
         if (customer == null || !clients.contains(customer)) {
             throw new IllegalArgumentException("Нельзя передавать несуществующего клиента");
         }
@@ -122,7 +122,7 @@ public class Bank {
         return accounts.get(id).getBalance();
     }
 
-    public void transfer(Customer customer, BigDecimal amount, Currency currency, long source, long destination) {
+    public static void transfer(Customer customer, BigDecimal amount, Currency currency, long source, long destination) {
         if (customer == null || !clients.contains(customer)) {
             throw new IllegalArgumentException("Нельзя передавать несуществующего клиента");
         }
@@ -135,14 +135,14 @@ public class Bank {
         accounts.get(source).transfer(accounts.get(destination), amount, currency);
     }
 
-    public boolean searchClientByPassportNumber(String passportNumber) {
+    public static boolean searchClientByPassportNumber(String passportNumber) {
         Customer fakeClient = new Customer("_", "_", passportNumber);
-        return this.clients.contains(fakeClient);
+        return clients.contains(fakeClient);
     }
 
-    public boolean searchAccountById(long id){
+    public static boolean searchAccountById(long id){
 
-        return this.accounts.containsKey(id);
+        return accounts.containsKey(id);
     }
 
 
