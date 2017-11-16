@@ -73,6 +73,9 @@ public class App {
                     checkAccountMoney();
                     break;
                 case 6:
+                    transferFromAccToAcc();
+                    break;
+                case 7:
                     menuAddStorage();
                     break;
                 default:
@@ -82,6 +85,16 @@ public class App {
         } while (command != 0);
         System.out.println("До свидания");
         System.exit(0);
+    }
+
+    private static void transferFromAccToAcc() {
+        System.out.println("Укажите клиента и счет с которого будет осуществлятся перевод");
+        Customer customer1 = askForClientInfo();
+        long accountId1 = askForAccountId();
+        double amount = askForAmount();
+        System.out.println("Укажиет клиента и счет на который будет осуществлен перевод");
+        Customer customer2 = askForClientInfo();
+        long accountId2 = askForAccountId();
     }
 
     private static void menuAddStorage() {
