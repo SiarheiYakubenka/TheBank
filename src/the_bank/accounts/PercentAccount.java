@@ -60,8 +60,8 @@ public class PercentAccount extends Account {
     public String toString() {
         return "PercentAccount{" +
                 "percent=" + percent +
-                "balance=" + getBalance() +
-                "currency=" + getCurrency()+
+                " balance=" + getBalance() +
+                " currency=" + getCurrency()+
                 "}";
     }
 }

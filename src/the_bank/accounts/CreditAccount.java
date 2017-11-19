@@ -53,8 +53,8 @@ public class CreditAccount extends Account {
     public String toString() {
         return "CreditAccount{" +
                 "percent=" + percent +
-                "balance=" + getBalance() +
-                "currency=" + getCurrency()+
+                " balance=" + getBalance() +
+                " currency=" + getCurrency()+
                 "}";
     }
 }

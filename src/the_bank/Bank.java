@@ -122,14 +122,16 @@ public class Bank {
         return accounts.get(id).getBalance();
     }
 
-    public static void transfer(Customer customer, BigDecimal amount, Currency currency, long source, long destination) {
-        if (customer == null || !clients.contains(customer)) {
+    public static void transfer(Customer customer1, Customer customer2 ,
+                                BigDecimal amount, Currency currency, long source, long destination) {
+
+        if (customer1 == null || customer2 == null || !clients.contains(customer1) || !clients.contains(customer2)) {
             throw new IllegalArgumentException("Нельзя передавать несуществующего клиента");
         }
         if (!accounts.containsKey(source) || !accounts.containsKey(destination)) {
             throw new IllegalArgumentException("Cчета не существует");
         }
-        if (!clientAccounts.get(customer).contains(source)) {
+        if (!clientAccounts.get(customer1).contains(source) || !clientAccounts.get(customer2).contains(destination)) {
             throw new IllegalArgumentException("Счет не принадлежит клиенту");
         }
         accounts.get(source).transfer(accounts.get(destination), amount, currency);

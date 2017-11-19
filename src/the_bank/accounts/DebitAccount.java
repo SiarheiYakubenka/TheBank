@@ -33,7 +33,7 @@ public class DebitAccount extends Account {
     public String toString() {
         return "DebitAccount{} " +
                 "balance=" + getBalance() +
-                "currency=" + getCurrency()+
+                " currency=" + getCurrency()+
                 "}";
     }
 

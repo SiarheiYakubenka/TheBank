@@ -3,6 +3,8 @@ package the_bank;
 import the_bank.accounts.*;
 import the_bank.accounts.Currency;
 import the_bank.customers.Customer;
+import the_bank.deposit_boxes.DepositBox;
+import the_bank.deposit_boxes.Shares;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -88,17 +90,23 @@ public class App {
     }
 
     private static void transferFromAccToAcc() {
-        System.out.println("Укажите клиента и счет с которого будет осуществлятся перевод");
+        System.out.println("Укажите номер паспорта клиента и счет с которого будет осуществлятся перевод");
         Customer customer1 = askForClientInfo();
         long accountId1 = askForAccountId();
+        System.out.println("Укажиет сумму и валюту перевода");
         double amount = askForAmount();
-        System.out.println("Укажиет клиента и счет на который будет осуществлен перевод");
+        Currency currency = askForAmountCurrency();
+        System.out.println("Укажиет номер паспорта клиента и счет на который будет осуществлен перевод");
         Customer customer2 = askForClientInfo();
         long accountId2 = askForAccountId();
+
+
+        transfer(customer1, customer2, new BigDecimal(String.valueOf(amount)), currency, accountId1, accountId2);
     }
 
     private static void menuAddStorage() {
         Customer customer = askForClientInfo();
+        clientInfo(customer);
         Long serviceAccount = askForServiceAccount(customer);
         if (serviceAccount == -1L) return;
         int typeStorage = askForStorageInfo();
@@ -108,11 +116,33 @@ public class App {
             case 0:
                 break;
             case 1:
+                askForShare(customer, accounts.get(serviceAccount));
                 break;
             case 2:
+                askForMetal();
                 break;
         }
 
+    }
+
+
+
+    private static void askForShare(Customer customer, Account serviceAccount) {
+        System.out.println("Введите название компании, акции которой будете хранить:");
+        String sName = sc.nextLine();
+        System.out.println("Введите цену за одну акцию в белорусских рублях");
+        double amount = askForAmount();
+        Shares shares = new Shares(sName, amount);
+        System.out.println("Введите количесто акций, которые собираетесь приобрести");
+        int sum = (int)askForAmount();
+        DepositBox depositBox = new DepositBox(shares, serviceAccount);
+        depositBox.deposit(sum);
+        addStorage(customer, depositBox);
+
+
+    }
+
+    private static void askForMetal() {
     }
 
     private static Long askForServiceAccount(Customer customer) {
@@ -209,8 +239,9 @@ public class App {
     private static void registerNewAccount() {
 
         Customer client = askForClientInfo();
-        int accountType = askForAccount();
+        clientInfo(client);
         Currency currency = askForCurrency();
+        int accountType = askForAccount();
         switch (accountType) {
             case 0:
                 return;
@@ -234,6 +265,7 @@ public class App {
 
     private static void withdrawAccountMoney() {
         Customer client = askForClientInfo();
+        clientInfo(client);
         long accountId = askForAccountId();
         double amount = askForAmount();
         try {
@@ -253,10 +285,11 @@ public class App {
 
     private static void depositAccountMoney() {
         Customer client = askForClientInfo();
+        clientInfo(client);
         long accountId = askForAccountId();
         BigDecimal amount = new BigDecimal(String.valueOf(askForAmount()));
         depositOnAccount(client, amount, accountId);
-        System.out.println("Деньги положены успешно");
+        System.out.println("Баланс пополнен успешно");
     }
 
     private static double askForAmount() {
@@ -336,7 +369,41 @@ public class App {
         int type;
 
         do {
-            System.out.println("Выберите тип счета");
+            System.out.println("Выберите валюту счета");
+            System.out.println("1. BYN");
+            System.out.println("2. EUR");
+            System.out.println("3. USD");
+            System.out.println("4. RUR");
+            try {
+                type = Integer.parseInt(sc.nextLine());
+            } catch (NumberFormatException e) {
+                type = -1;
+            }
+            switch (type) {
+                case 1:
+                    return Currency.BYN;
+                case 2:
+                    return Currency.EUR;
+                case 3:
+                    return Currency.USD;
+                case 4:
+                    return Currency.RUR;
+                default:
+                    type = -1;
+                    break;
+            }
+
+        } while (type == -1);
+
+        return Currency.BYN;
+    }
+
+    private static Currency askForAmountCurrency() {
+
+        int type;
+
+        do {
+            System.out.println("Выберите валюту:");
             System.out.println("1. BYN");
             System.out.println("2. EUR");
             System.out.println("3. USD");
@@ -382,13 +449,40 @@ public class App {
     }
 
     private static Customer askForClientInfo() {
-        System.out.print("Введите номер паспорта =");
-        String passportNumber = sc.nextLine();
-        boolean clientExists = searchClientByPassportNumber(passportNumber);
-        if (clientExists) {
-            return new Customer("_", "_", passportNumber);
+
+        Customer customer = null;
+        boolean b = true;
+        do {
+            System.out.print("Введите номер паспорта = ");
+
+                String passportNumber = sc.nextLine();
+                boolean clientExists = searchClientByPassportNumber(passportNumber);
+                if (clientExists) {
+                    customer = new Customer("_", "_", passportNumber);
+                    b = false;
+                }else {
+                    System.out.println("Клиента с таким номером паспорта не существует");
+                }
+
+        } while (b);
+
+        return customer;
+    }
+
+    private static void clientInfo(Customer customer){
+
+        for (Customer c1 : clients) {
+            if (c1.equals(customer)){
+                System.out.println(c1);
+            }
         }
 
-        return null;
+
+
+        for ( long id: clientAccounts.get(customer) ) {
+            System.out.println(accounts.get(id)+"Id счета = "+id);
+        }
+
     }
+
 }
